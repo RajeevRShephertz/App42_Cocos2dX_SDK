@@ -6,6 +6,17 @@ Migration Note:-
 __The way of providing response callback in every API is changed in this release__
 
 Please follow the steps mentioned below for migrating your build from previous version to this version:
+
+__Previous Version Code Snippet for .h file__
+```
+//TestPushNotificationService.h
+
+class TestPushNotificationService : public cocos2d::Layer
+{
+   void onPushRequestCompleted(cocos2d::Node *sender, void *response)
+};
+```
+__New Version Code Snippet .h file__
 ```
 //TestPushNotificationService.h
 #include "App42API.h"
@@ -17,9 +28,45 @@ class TestPushNotificationService : public cocos2d::Layer, public App42CallBack
    
    //Callback method declaration
    void onPushRequestCompleted(App42CallBack *sender, void *response);
-}
+};
 ```
 
+__Previous Version Code Snippet for .cpp file__
+```
+//TestPushNotificationService.cpp
+
+void TestPushNotificationService::registerDeviceToken(Ref *sender)
+{
+    //Calling PushNotification service API
+    PushNotificationService *pushService = App42API::BuildPushNotificationService();
+    pushService->registerDeviceToken(deviceToken, userName, deviceType, this, callfuncND_selector(HelloWorld::onPushRequestCompleted));
+}
+
+void TestPushNotificationService::onPushRequestCompleted(cocos2d::Node *sender, void *response)
+{
+    App42PushNotificationResponse *pushResponse = (App42PushNotificationResponse*)response;
+    printf("\ncode=%d",pushResponse->getCode());
+    printf("\nResponse Body=%s",pushResponse->getBody().c_str());
+    if (!pushResponse->isSuccess)
+    {
+        printf("\nerrordetails:%s",pushResponse->errorDetails.c_str());
+        printf("\nerrorMessage:%s",pushResponse->errorMessage.c_str());
+        printf("\nappErrorCode:%d",pushResponse->appErrorCode);
+        printf("\nhttpErrorCode:%d",pushResponse->httpErrorCode);
+    }
+    else
+    {
+        for(std::vector<App42PushNotification>::iterator it = pushResponse->notification.begin(); it != pushResponse->notification.end(); ++it)
+        {
+            printf("\n UserName=%s",it->userName.c_str());
+            printf("\n Message=%s\n",it->message.c_str());
+        }
+    }
+}
+
+```
+
+__New Version Code Snippet .cpp file__
 ```
 //TestPushNotificationService.cpp
 
