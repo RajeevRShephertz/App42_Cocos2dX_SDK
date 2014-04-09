@@ -4,6 +4,7 @@ App42_Cocos2dX_SDK
 Migration Note:-
 
 __The way of providing response callback in every API is changed in this release__
+
 Please follow the steps mentioned below for migrating your build from previous version to this version:
 ```
 //TestPushNotificationService.h
